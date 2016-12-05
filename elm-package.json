@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "Create and modify DOM nodes by pipelining",
-    "repository": "https://github.com/user/project.git",
+    "repository": "https://github.com/teppic/elm-html-pipeline.git",
     "license": "BSD3",
     "source-directories": [
         "src"

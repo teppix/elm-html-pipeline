@@ -5,7 +5,6 @@ module Html.Pipeline.Nodes exposing (..)
 ## Blocks
 @docs div
 
-
 ## Form
 @docs input
 
@@ -20,9 +19,13 @@ module Html.Pipeline.Nodes exposing (..)
 
 ## Attributes
 @docs href
+
+## Events
+@docs onClick
 -}
 
-import Html.Pipeline exposing (Node, Modifier, node, attr)
+import Html.Pipeline exposing (Node, Modifier, node, attr, strAttr)
+import Html.Events as Events
 
 
 {-| div node
@@ -120,4 +123,11 @@ p =
 -}
 href : String -> Modifier msg
 href =
-    attr "href"
+    strAttr "href"
+
+
+{-| onClick
+-}
+onClick : msg -> Modifier msg
+onClick msg =
+    attr (Events.onClick msg)

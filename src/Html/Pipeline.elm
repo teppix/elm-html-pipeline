@@ -1,4 +1,4 @@
-module Html.Pipeline exposing (Node, Modifier, when, id, class, styles, style, text, newline, add, html, node, toHtml, attr, boolProperty)
+module Html.Pipeline exposing (Node, Modifier, when, id, class, styles, style, text, newline, add, html, node, toHtml, strAttr, attr, boolProperty)
 
 {-| Library for building HTML elements by pipelining modifier functions
 
@@ -14,7 +14,7 @@ module Html.Pipeline exposing (Node, Modifier, when, id, class, styles, style, t
 @docs add, html, text, newline
 
 ## Attributes
-@docs id, class, style, styles, attr, boolProperty
+@docs id, class, style, styles, strAttr, attr, boolProperty
 
 # Conditionals
 @docs when
@@ -36,7 +36,6 @@ type alias Node msg =
     , attrs : List ( String, String )
     , classes :
         List String
-        --, content : List (H.Html msg)
     , content : List (Content msg)
     , attributes : List (H.Attribute msg)
     }
@@ -104,11 +103,18 @@ class s h =
     { h | classes = (s :: h.classes) }
 
 
+{-| Add custom string attribute
+-}
+strAttr : String -> String -> Modifier msg
+strAttr key val node =
+    { node | attributes = (HA.attribute key val) :: node.attributes }
+
+
 {-| Add custom attribute
 -}
-attr : String -> String -> Modifier msg
-attr key val node =
-    { node | attributes = (HA.attribute key val) :: node.attributes }
+attr : H.Attribute msg -> Modifier msg
+attr value node =
+    { node | attributes = value :: node.attributes }
 
 
 {-| Add single style
