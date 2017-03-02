@@ -1,4 +1,4 @@
-module Html.Pipeline exposing (Node, Modifier, when, id, class, styles, style, text, newline, add, html, node, toHtml, strAttr, attr, boolProperty)
+module Html.Pipeline exposing (Node, Modifier, choice, when, fromMaybe, id, class, styles, style, text, newline, add, html, node, toHtml, strAttr, attr, boolProperty, for)
 
 {-| Library for building HTML elements by pipelining modifier functions
 
@@ -16,8 +16,11 @@ module Html.Pipeline exposing (Node, Modifier, when, id, class, styles, style, t
 ## Attributes
 @docs id, class, style, styles, strAttr, attr, boolProperty
 
+## Attribute helpers
+@docs for
+
 # Conditionals
-@docs when
+@docs when, choice, fromMaybe
 
 # Types
 @docs Node, Modifier
@@ -138,6 +141,13 @@ boolProperty key node =
     { node | attributes = (HA.property key (Json.bool True)) :: node.attributes }
 
 
+{-| Shorthand for the "for" attribute
+-}
+for : String -> Modifier msg
+for forid =
+    strAttr "for" forid
+
+
 {-| Add Node element
 -}
 add : List (Node msg) -> Modifier msg
@@ -175,8 +185,8 @@ newline =
 
 {-| Apply fa or fb to val depending on value of cond
 -}
-choose : (a -> a) -> (a -> a) -> Bool -> (a -> a)
-choose fa fb cond val =
+choice : (a -> a) -> (a -> a) -> Bool -> (a -> a)
+choice fa fb cond val =
     (if cond then
         fa
      else
@@ -189,4 +199,16 @@ choose fa fb cond val =
 -}
 when : (a -> a) -> Bool -> a -> a
 when f cond val =
-    (choose f identity) cond val
+    (choice f identity) cond val
+
+
+{-| Conditionally apply modifier in Maybe
+-}
+fromMaybe : Maybe (a -> a) -> a -> a
+fromMaybe mf =
+    case mf of
+        Just f ->
+            f
+
+        Nothing ->
+            identity

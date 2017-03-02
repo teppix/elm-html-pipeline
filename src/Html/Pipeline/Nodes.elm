@@ -3,7 +3,7 @@ module Html.Pipeline.Nodes exposing (..)
 {-| Library for building HTML elements by pipelining modifier functions
 
 ## Blocks
-@docs div
+@docs div, span
 
 ## Form
 @docs input
@@ -17,15 +17,19 @@ module Html.Pipeline.Nodes exposing (..)
 ## Headings
 @docs h1, h2, h3, h4, h5, h6
 
+## Lists
+@docs ul, li
+
 ## Attributes
 @docs href
 
 ## Events
-@docs onClick
+@docs onClick, onClickTouch, onCheck, onInput
 -}
 
 import Html.Pipeline exposing (Node, Modifier, node, attr, strAttr)
 import Html.Events as Events
+import Json.Decode as Json
 
 
 {-| div node
@@ -33,6 +37,13 @@ import Html.Events as Events
 div : Node msg
 div =
     node "div"
+
+
+{-| span node
+-}
+span : Node msg
+span =
+    node "span"
 
 
 {-| input node
@@ -105,6 +116,20 @@ h6 =
     node "h6"
 
 
+{-| ul node
+-}
+ul : Node msg
+ul =
+    node "ul"
+
+
+{-| li node
+-}
+li : Node msg
+li =
+    node "li"
+
+
 {-| br node
 -}
 br : Node msg
@@ -126,8 +151,36 @@ href =
     strAttr "href"
 
 
+{-| onInput
+-}
+onInput : (String -> msg) -> Modifier msg
+onInput msg =
+    attr (Events.onInput msg)
+
+
 {-| onClick
 -}
 onClick : msg -> Modifier msg
 onClick msg =
     attr (Events.onClick msg)
+
+
+{-| onClickTouch
+-}
+onClickTouch : msg -> Modifier msg
+onClickTouch message =
+    on "touch touchstart" message
+
+
+{-| onCheck
+-}
+onCheck : (Bool -> msg) -> Modifier msg
+onCheck val =
+    attr (Events.onCheck val)
+
+
+{-| on
+-}
+on : String -> msg -> Modifier msg
+on event message =
+    attr <| Events.on event (Json.succeed message)
