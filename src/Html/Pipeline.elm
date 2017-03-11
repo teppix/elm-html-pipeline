@@ -1,4 +1,4 @@
-module Html.Pipeline exposing (Node, Modifier, choice, when, fromMaybe, id, class, styles, style, text, newline, add, html, node, toHtml, strAttr, attr, boolProperty, for)
+module Html.Pipeline exposing (Node, Modifier, choice, applyIf, applyMaybe, id, class, styles, style, text, newline, add, html, node, toHtml, strAttr, attr, boolProperty, for, map)
 
 {-| Library for building HTML elements by pipelining modifier functions
 
@@ -20,10 +20,13 @@ module Html.Pipeline exposing (Node, Modifier, choice, when, fromMaybe, id, clas
 @docs for
 
 # Conditionals
-@docs when, choice, fromMaybe
+@docs applyIf, choice, applyMaybe
 
 # Types
 @docs Node, Modifier
+
+# Transforms
+@docs map
 -}
 
 import Html as H
@@ -197,18 +200,40 @@ choice fa fb cond val =
 
 {-| Conditionally apply f to val
 -}
-when : (a -> a) -> Bool -> a -> a
-when f cond val =
+applyIf : (a -> a) -> Bool -> a -> a
+applyIf f cond val =
     (choice f identity) cond val
 
 
 {-| Conditionally apply modifier in Maybe
 -}
-fromMaybe : Maybe (a -> a) -> a -> a
-fromMaybe mf =
+applyMaybe : Maybe (a -> a) -> a -> a
+applyMaybe mf =
     case mf of
         Just f ->
             f
 
         Nothing ->
             identity
+
+
+{-| Map message type
+-}
+map : (a -> b) -> Node a -> Node b
+map f n =
+    let
+        mapContent v =
+            case v of
+                NodeContent x ->
+                    NodeContent (map f x)
+
+                HtmlContent x ->
+                    HtmlContent (H.map f x)
+
+        mapAttribute =
+            HA.map f
+    in
+        { n
+            | content = List.map mapContent n.content
+            , attributes = List.map mapAttribute n.attributes
+        }
